@@ -32,8 +32,8 @@ AuricPlay is incredibly easy to set up. It requires no backend, no databases, an
 **Option A: Direct Open (Simplest)**
 Double-click `index.html` to open it directly in any modern web browser.
 
-**Option B: Local Web Server (Recommended)**
-Run a lightweight local server from the project root directory:
+**Option B: Local Preview Server (Recommended for Audio Visuals)**
+Run a lightweight local server from the project root directory. *Note: This project contains no backend; this server simply allows the browser to bypass local file restrictions for the Audio Visualizer and Crossfading.*
 ```bash
 # Python 3
 python -m http.server 8080
