@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AuricPlay – Music Player</title>
+  <meta name="description" content="AuricPlay – A premium web music streaming experience"/>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/animations.css"/>
+</head>
+<body>
+
+  <!-- 
+       APP SHELL
+   -->
+  <div class="app-shell" id="appShell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+      <!-- Logo -->
+      <div class="sidebar-logo">
+        <span class="logo-mark">L</span>
+        <span class="logo-text">AuricPlay</span>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-view="home"    onclick="App.navigate('home')">
+          <span class="nav-icon">⌂</span><span class="nav-label">Home</span>
+        </button>
+        <button class="nav-item"        data-view="search"  onclick="App.navigate('search')">
+          <span class="nav-icon">◎</span><span class="nav-label">Search</span>
+        </button>
+        <button class="nav-item"        data-view="library" onclick="App.navigate('library')">
+          <span class="nav-icon">◈</span><span class="nav-label">Library</span>
+        </button>
+        <button class="nav-item"        data-view="favorites" onclick="App.navigate('favorites')">
+          <span class="nav-icon">♡</span><span class="nav-label">Favorites</span>
+          <span class="nav-badge" id="favBadge" style="display:none">0</span>
+        </button>
+        <button class="nav-item"        data-view="history" onclick="App.navigate('history')">
+          <span class="nav-icon">◷</span><span class="nav-label">History</span>
+        </button>
+      </nav>
+
+      <!-- Queue Panel -->
+      <div class="sidebar-queue">
+        <div class="queue-header">
+          <span class="queue-title">Queue</span>
+          <button class="queue-clear-btn" onclick="App.clearQueue()" title="Clear queue">✕</button>
+        </div>
+        <div class="queue-list" id="queueList">
+          <div class="queue-empty">No tracks in queue</div>
+        </div>
+      </div>
+
+      <!-- User Footer -->
+      <div class="sidebar-user">
+        <div class="user-avatar">B</div>
+        <div class="user-info">
+          <div class="user-name">User</div>
+          <div class="user-sub">Pro Member</div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content" id="mainContent">
+      <!-- Views rendered dynamically by ui.js -->
+      <div class="view-container" id="viewContainer"></div>
+    </main>
+
+    <!-- PLAYER BAR -->
+    <div class="player-bar" id="playerBar">
+
+      <!-- Left: Track Info -->
+      <div class="pb-track" id="pbTrack">
+        <div class="pb-art-wrap">
+          <div class="pb-art" id="pbArt">
+            <span class="pb-art-placeholder">♪</span>
+          </div>
+        </div>
+        <div class="pb-info">
+          <div class="pb-title" id="pbTitle">Select a track to play</div>
+          <div class="pb-artist" id="pbArtist">—</div>
+        </div>
+        <button class="pb-heart" id="pbHeart" onclick="App.toggleFavorite()" title="Like (L)">♡</button>
+      </div>
+
+      <!-- Center: Controls + Progress -->
+      <div class="pb-center">
+        <div class="pb-controls">
+          <button class="pb-btn"       id="shuffleBtn"  onclick="App.toggleShuffle()" title="Shuffle (S)">⇄</button>
+          <button class="pb-btn"       id="prevBtn"     onclick="App.prevTrack()"     title="Previous (P)">⏮</button>
+          <button class="pb-btn pb-play" id="playBtn"   onclick="App.togglePlay()"    title="Play/Pause (Space)">▶</button>
+          <button class="pb-btn"       id="nextBtn"     onclick="App.nextTrack()"     title="Next (N)">⏭</button>
+          <button class="pb-btn"       id="repeatBtn"   onclick="App.cycleRepeat()"   title="Repeat (R)">↺</button>
+        </div>
+        <div class="pb-progress">
+          <span class="pb-time" id="pbCurrentTime">0:00</span>
+          <div class="pb-bar-wrap" id="pbBarWrap">
+            <div class="pb-bar-fill" id="pbBarFill"></div>
+            <div class="pb-bar-thumb" id="pbBarThumb"></div>
+          </div>
+          <span class="pb-time right" id="pbTotalTime">0:00</span>
+        </div>
+      </div>
+
+      <!-- Right: Volume + Extras -->
+      <div class="pb-extras">
+        <button class="pb-btn sm" id="vizToggleBtn" onclick="Visualizer.toggleMode()" title="Toggle visualizer">≋</button>
+        <button class="pb-btn sm" id="fsBtn"        onclick="App.toggleFullscreen()"  title="Fullscreen (F)">⛶</button>
+        <button class="pb-btn sm" id="muteBtn"      onclick="App.toggleMute()"        title="Mute (M)">🔊</button>
+        <div class="pb-vol-wrap">
+          <input type="range" class="pb-vol" id="volSlider" min="0" max="100" value="80"
+                 oninput="App.setVolume(this.value / 100)" title="Volume (↑↓)"/>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- FULLSCREEN OVERLAY -->
+    <div class="fullscreen-overlay hidden" id="fullscreenOverlay">
+      <div class="fs-bg" id="fsBg"></div>
+      <div class="fs-content">
+        <button class="fs-close" onclick="App.toggleFullscreen()">✕</button>
+
+        <div class="fs-left">
+          <canvas id="vizCanvas"></canvas>
+          <div class="fs-viz-label" id="fsVizLabel">FREQUENCY</div>
+        </div>
+
+        <div class="fs-center">
+          <div class="fs-art" id="fsArt">
+            <span class="fs-art-placeholder">♪</span>
+          </div>
+          <div class="fs-track-info">
+            <div class="fs-genre" id="fsGenre">—</div>
+            <div class="fs-title" id="fsTitle">Select a track</div>
+            <div class="fs-artist" id="fsArtist">—</div>
+          </div>
+          <div class="fs-controls">
+            <button class="pb-btn" id="fsPrevBtn"   onclick="App.prevTrack()">⏮</button>
+            <button class="pb-btn pb-play lg" id="fsPlayBtn" onclick="App.togglePlay()">▶</button>
+            <button class="pb-btn" id="fsNextBtn"   onclick="App.nextTrack()">⏭</button>
+          </div>
+          <div class="fs-progress">
+            <span class="pb-time" id="fsCurrent">0:00</span>
+            <div class="pb-bar-wrap" id="fsBarWrap">
+              <div class="pb-bar-fill" id="fsBarFill"></div>
+            </div>
+            <span class="pb-time right" id="fsTotal">0:00</span>
+          </div>
+        </div>
+
+        <div class="fs-right">
+          <div class="fs-up-next">
+            <div class="up-next-label">Up Next</div>
+            <div id="fsUpNext" class="up-next-list"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div class="toast hidden" id="toast"></div>
+
+  </div><!-- /app-shell -->
+
+  <!-- HIDDEN AUDIO ELEMENT -->
+  <audio id="audioEl" crossorigin="anonymous" preload="metadata"></audio>
+
+  <!-- SCRIPTS (order matters) -->
+  <script src="js/api.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/visualizer.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
+
