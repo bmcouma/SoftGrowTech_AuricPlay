@@ -170,7 +170,8 @@ const UI = (() => {
   }
 
   /* LIBRARY VIEW */
-  function renderLibrary(tracks, currentId, favorites) {
+  function renderLibrary(tracks, currentId, favorites, settings) {
+    const sortOrder = settings?.sortOrder || 'default';
     if (!tracks.length) return `
       <div class="view-enter">
         <div class="view-header">
@@ -185,9 +186,20 @@ const UI = (() => {
 
     return `
       <div class="view-enter">
-        <div class="view-header">
-          <div class="view-title">Library</div>
-          <div class="view-subtitle">${tracks.length} tracks</div>
+        <div class="view-header flex-between">
+          <div>
+            <div class="view-title">All Songs</div>
+            <div class="view-subtitle">${tracks.length} tracks in your collection</div>
+          </div>
+          <div class="view-actions">
+            <label class="sort-label" for="libSort">Sort by:</label>
+            <select id="libSort" class="sort-select" onchange="App.updateSetting('sortOrder', this.value)">
+              <option value="default" ${sortOrder === 'default' ? 'selected' : ''}>Date Added</option>
+              <option value="az" ${sortOrder === 'az' ? 'selected' : ''}>A-Z</option>
+              <option value="za" ${sortOrder === 'za' ? 'selected' : ''}>Z-A</option>
+              <option value="artist" ${sortOrder === 'artist' ? 'selected' : ''}>Artist</option>
+            </select>
+          </div>
         </div>
         ${_trackTable(tracks, currentId, favorites)}
       </div>`;

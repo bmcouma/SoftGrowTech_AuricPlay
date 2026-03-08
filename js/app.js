@@ -327,7 +327,7 @@ const App = (() => {
         else if (ord === 'za') sorted.sort((a,b) => b.title.localeCompare(a.title));
         else if (ord === 'artist') sorted.sort((a,b) => a.artist.localeCompare(b.artist));
         
-        container.innerHTML = UI.renderLibrary(sorted, cid, fav);
+        container.innerHTML = UI.renderLibrary(sorted, cid, fav, STATE.settings);
         break;
       }
 
