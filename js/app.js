@@ -148,8 +148,31 @@ const App = (() => {
 
   /* ─── Play track by track ID ─────────────────── */
   function playTrackById(id) {
+    // First try the current playlist (normal case: genre / search view)
     const index = STATE.playlist.findIndex(t => t.id === id);
-    if (index !== -1) playTrack(index);
+    if (index !== -1) {
+      playTrack(index);
+      return;
+    }
+
+    // Not in current playlist — look in history, then library
+    const track = STATE.history.find(t => t.id === id)
+               || STATE.library.find(t => t.id === id);
+    if (!track) return;
+
+    // Set playlist to the source list so next/prev works naturally
+    const sourceList = STATE.history.find(t => t.id === id)
+      ? STATE.history
+      : STATE.library;
+    STATE.playlist     = [...sourceList];
+    STATE.currentIndex = -1;
+    STATE.shuffleBag   = [];
+
+    const newIndex = STATE.playlist.findIndex(t => t.id === id);
+    if (newIndex !== -1) {
+      UI.updateQueue(STATE.playlist, id);
+      playTrack(newIndex);
+    }
   }
 
   /* ─── Toggle play/pause ──────────────────────── */

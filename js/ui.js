@@ -43,7 +43,7 @@ const UI = (() => {
       <div class="track-row ${isPlaying ? 'playing' : ''} track-row-enter"
            style="animation-delay:${Math.min(index * 0.03, 0.4)}s"
            data-id="${track.id}" data-index="${index}"
-           onclick="App.playTrack(${index})">
+           onclick="App.playTrackById('${track.id}')">
         <div class="tr-num">${eqHtml}</div>
         <div class="tr-info">
           <div class="tr-art">${artHtml}<div class="tr-art-overlay">▶</div></div>
